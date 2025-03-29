@@ -50,4 +50,5 @@ export interface Questionnaire {
   updatedAt?: string;
   createdBy?: string;
   updatedBy?: string;
+  displayIndex?: number;
 }

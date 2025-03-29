@@ -133,6 +133,38 @@ backdrop-filter: blur(4px);
 -webkit-backdrop-filter: blur(4px);
 backdrop-filter: blur(4px);
 
+    th.mat-mdc-header-cell {
+      position: relative;
+      padding-right: 24px;
+
+      mat-icon {
+        position: absolute;
+        left: 0px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 18px;
+        opacity: 0.6;
+        transition: all 0.2s ease;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    .mat-mdc-header-cell {
+      .mat-icon {
+        margin-left: 4px;
+        font-size: 18px;
+        vertical-align: middle;
+        transition: transform 0.2s ease;
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+
     table {
       width: 100%;
 

@@ -20,6 +20,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { ConfirmDialogComponent } from '../../../shared/@components/confirm-dialog/confirm-dialog.component';
 import { QuestionnaireService } from '../../../shared/@services/questionnaire.service';
 import { Questionnaire } from '../../../shared/@interface/question.models';
+import { PreviewDialogComponent } from '../form/preview-dialog/preview-dialog.component';
 
 @Component({
   selector: 'app-questionnaire-list',
@@ -40,7 +41,8 @@ import { Questionnaire } from '../../../shared/@interface/question.models';
     MatNativeDateModule,
     MatSelectModule,
     FormsModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    PreviewDialogComponent
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
@@ -49,6 +51,8 @@ export class QuestionnaireListComponent implements OnInit {
   questionnaires: Questionnaire[] = [];
   filteredQuestionnaires: Questionnaire[] = [];
   displayedColumns: string[] = ['index', 'title', 'status', 'responseCount', 'createdAt', 'actions'];
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
   isLoading = false;
   showBackToTop = false;
 
@@ -109,8 +113,18 @@ export class QuestionnaireListComponent implements OnInit {
   }
 
   applyFilters() {
-    this.filteredQuestionnaires = this.questionnaires.filter(questionnaire => {
-      const titleMatch = !this.filterTitle || questionnaire.title.toLowerCase().includes(this.filterTitle.toLowerCase());
+    // 先為每個問卷添加原始序號
+    this.questionnaires = this.questionnaires.map((questionnaire, index) => ({
+      ...questionnaire,
+      displayIndex: index + 1
+    }));
+
+    let filtered = this.questionnaires.filter((questionnaire) => {
+      const displayIndex = (questionnaire.displayIndex || '').toString();
+      const searchText = this.filterTitle.toLowerCase();
+      const titleMatch = !this.filterTitle || 
+        questionnaire.title.toLowerCase().includes(searchText) ||
+        displayIndex.toLowerCase().includes(searchText);
       const statusMatch = !this.filterStatus || questionnaire.status === this.filterStatus;
       
       let dateMatch = true;
@@ -130,6 +144,36 @@ export class QuestionnaireListComponent implements OnInit {
 
       return titleMatch && statusMatch && dateMatch;
     });
+
+
+
+    // 應用排序
+    if (this.sortColumn) {
+      filtered.sort((a, b) => {
+        let comparison = 0;
+        switch (this.sortColumn) {
+          case 'index':
+            const aIndex = filtered.findIndex(q => q.id === a.id) + 1;
+            const bIndex = filtered.findIndex(q => q.id === b.id) + 1;
+            comparison = aIndex - bIndex;
+            break;
+          case 'title':
+            comparison = a.title.localeCompare(b.title);
+            break;
+          case 'responseCount':
+            comparison = (a.responseCount || 0) - (b.responseCount || 0);
+            break;
+          case 'createdAt':
+            const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            comparison = aDate - bDate;
+            break;
+        }
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    this.filteredQuestionnaires = filtered;
     this.updatePagedData();
   }
 
@@ -397,9 +441,39 @@ export class QuestionnaireListComponent implements OnInit {
     
     if (questionnaire.status === 'DRAFT') {
       this.router.navigate(['/questionnaires/edit', questionnaire.id]);
-    } else if (questionnaire.status === 'PUBLISHED') {
-      this.snackBar.open('問卷已發布，不可修改', '關閉', { duration: 3000 });
+    } else if (questionnaire.status === 'PUBLISHED' || questionnaire.status === 'CLOSED') {
+      // 獲取問卷內容並打開預覽對話框
+      this.questionnaireService.getQuestionnaire(questionnaire.id!).subscribe({
+        next: (fullQuestionnaire) => {
+          this.dialog.open(PreviewDialogComponent, {
+            data: fullQuestionnaire,
+            width: '800px',
+            maxHeight: '90vh'
+          });
+        },
+        error: (error) => {
+          console.error('載入問卷失敗:', error);
+          this.snackBar.open('載入問卷失敗', '關閉', { duration: 3000 });
+        }
+      });
+      
+      if (questionnaire.status === 'PUBLISHED') {
+        this.snackBar.open('問卷已發布，不可修改', '關閉', { duration: 3000 });
+      } else {
+        this.snackBar.open('問卷已結束，不可修改', '關閉', { duration: 3000 });
+      }
     }
+  }
+
+  // 排序處理
+  sort(column: string) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
+    this.applyFilters();
   }
 
   onWindowScroll(): void {
