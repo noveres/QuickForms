@@ -1,15 +1,49 @@
 <div class="container fade-in">
   <div class="questionnaire-list">
+    <div class="floating-buttons">
+      <button mat-fab class="back-to-top" (click)="scrollToTop()" [class.show]="showBackToTop">
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
+      <button mat-fab class="add-questionnaire"  [routerLink]="['/questionnaires/new']"[class.show]="showBackToTop">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
     <div class="list-header">
       <h1>問卷列表</h1>
-      <button mat-raised-button color="primary" [routerLink]="['/questionnaires/new']">
-        <mat-icon>add</mat-icon>
-        新建問卷
+    </div>
+
+    <!-- 篩選區域 -->
+    <div class="filter-section mat-elevation-z1">
+      <mat-form-field appearance="outline">
+        <mat-label>標題搜尋</mat-label>
+        <input matInput [(ngModel)]="filterTitle" (ngModelChange)="applyFilters()" placeholder="輸入標題關鍵字">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>開始日期</mat-label>
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="filterStartDate" (ngModelChange)="applyFilters()">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+
+      <mat-form-field appearance="outline">
+        <mat-label>狀態</mat-label>
+        <mat-select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()">
+          <mat-option *ngFor="let option of statusOptions" [value]="option.value">
+            {{option.label}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button color="basic" (click)="clearFilters()">
+        <mat-icon>clear_all</mat-icon>
+        清空篩選
       </button>
     </div>
 
     <div class="table-container mat-elevation-z2">
-      <table mat-table [dataSource]="questionnaires" class="mat-elevation-z0">
+      <table mat-table [dataSource]="pagedQuestionnaires" class="mat-elevation-z0">
         <!-- 編號欄位 -->
         <ng-container matColumnDef="index">
           <th mat-header-cell *matHeaderCellDef> 編號 </th>
@@ -31,9 +65,13 @@
         <ng-container matColumnDef="status">
           <th mat-header-cell *matHeaderCellDef>狀態</th>
           <td mat-cell *matCellDef="let questionnaire">
-            <mat-chip [color]="getStatusColor(questionnaire.status)" selected>
+            <div class="status-label" [ngClass]="{
+              'status-draft': questionnaire.status === 'DRAFT',
+              'status-published': questionnaire.status === 'PUBLISHED',
+              'status-closed': questionnaire.status === 'CLOSED'
+            }">
               {{ getStatusText(questionnaire.status) }}
-            </mat-chip>
+            </div>
           </td>
         </ng-container>
 
@@ -71,11 +109,15 @@
               </button>
               <button mat-menu-item (click)="copyQuestionnaire(questionnaire.id!)">
                 <mat-icon>content_copy</mat-icon>
-                <span>複製</span>
+                <span>複製問卷</span>
               </button>
               <button mat-menu-item *ngIf="questionnaire.status !== 'PUBLISHED' && questionnaire.status !== 'CLOSED'" (click)="publishQuestionnaire(questionnaire.id!)">
                 <mat-icon>publish</mat-icon>
                 <span>發布</span>
+              </button>
+              <button mat-menu-item *ngIf="questionnaire.status === 'PUBLISHED' && questionnaire.responseCount >= 0" (click)="share(questionnaire.id!)">
+                <mat-icon>share</mat-icon>
+                <span>複製連結</span>
               </button>
               <button mat-menu-item *ngIf="questionnaire.status === 'PUBLISHED' && questionnaire.responseCount <= 0" (click)="unpublishQuestionnaire(questionnaire.id!)">
                 <mat-icon>unpublished</mat-icon>
@@ -108,6 +150,15 @@
         <mat-icon>inbox</mat-icon>
         <p>暫無問卷</p>
       </div>
+
+      <mat-paginator
+        [length]="filteredQuestionnaires.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="currentPage"
+        (page)="onPageChange($event)"
+        aria-label="選擇頁面">
+      </mat-paginator>
     </div>
   </div>
 </div>

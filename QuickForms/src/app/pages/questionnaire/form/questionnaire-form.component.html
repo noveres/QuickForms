@@ -12,10 +12,10 @@
           <mat-icon>save</mat-icon>
           {{ isEditMode ? '更新' : '保存' }}
         </button>
-        <button mat-stroked-button type="button" (click)="share()">
+        <!-- <button mat-stroked-button type="button" (click)="share()">
           <mat-icon>share</mat-icon>
           分享
-        </button>
+        </button> -->
         <button mat-raised-button type="button" color="primary" (click)="publish()" [disabled]="isPublishing || !questionnaireId">
           <mat-icon>publish</mat-icon>
           發布

@@ -57,28 +57,27 @@ import { Router, UrlTree } from '@angular/router';
       <button mat-button [matMenuTriggerFor]="userMenu" 
               class="user-menu-button">
         <div class="user-avatar">
-          <img [src]="userAvatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'" 
+          <img [src]="currentUser?.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'" 
                alt="用戶頭像"
                class="avatar-img">
         </div>
-        <span class="username">{{ username }}</span>
+        <span class="username">{{ currentUser?.username  }}</span>
         <mat-icon>arrow_drop_down</mat-icon>
       </button>
 
       <mat-menu #userMenu="matMenu" class="user-menu">
         <div class="menu-header">
-          <img [src]="userAvatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'" 
+          <img [src]="currentUser?.avatar || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'" 
                alt="用戶頭像"
                class="menu-avatar">
           <div class="user-info">
-            <span class="display-name">{{ username }}</span>
-            <span class="role">{{ isAdmin ? '管理者' : '一般用戶' }}</span>
+            <span class="display-name">{{ currentUser?.username }}</span>
+            <span class="role">{{ currentUser?.isAdmin ? '管理者' : '一般用戶' }}</span>
           </div>
         </div>
-
+        
         <mat-divider></mat-divider>
-
-        <button mat-menu-item routerLink="/profile">
+        <button  mat-menu-item> <!-- routerLink="/profile"> -->         
           <mat-icon>person</mat-icon>
           <span>個人資料</span>
         </button>
@@ -359,15 +358,36 @@ export class NavBarComponent {
   username = '超可愛少女';
   userAvatar: string | null = null;
   isAdmin = false;
+  currentUser: { name: string; username: string; avatar?: string; isAdmin?: boolean } | null = null;
+
+  ngOnInit() {
+    const userData = localStorage.getItem('currentUser');
+    this.currentUser = userData ? JSON.parse(userData) : null;
+    if (this.currentUser) {
+      this.username = this.currentUser.username || this.currentUser.name;
+      this.userAvatar = this.currentUser.avatar || null;
+      this.isAdmin = this.currentUser.isAdmin || false;
+    }
+  }
 
   toggleRole() {
     this.isAdmin = !this.isAdmin;
   }
 
   logout() {
-    // 實現登出邏輯
-    //路由導向登陸業 
-    console.log('登出');
-    this.router.navigate(['/login']);
+    localStorage.removeItem('currentUser');
+    this.currentUser = null;
+    this.username = '超可愛少女';
+    this.userAvatar = null;
+    this.isAdmin = false;
+    // 清除瀏覽器的路由歷史記錄
+    window.history.pushState(null, '', '/login');
+    window.history.replaceState(null, '', '/login');
+    window.history.go(1);
+    // 導航到登入頁面
+    this.router.navigate(['/login'], {
+      replaceUrl: true,
+      queryParams: { expired: 'true' }
+    });
   }
 }

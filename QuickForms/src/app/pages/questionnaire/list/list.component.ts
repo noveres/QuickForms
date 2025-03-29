@@ -10,6 +10,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { ConfirmDialogComponent } from '../../../shared/@components/confirm-dialog/confirm-dialog.component';
 import { QuestionnaireService } from '../../../shared/@services/questionnaire.service';
 import { Questionnaire } from '../../../shared/@interface/question.models';
@@ -26,15 +33,52 @@ import { Questionnaire } from '../../../shared/@interface/question.models';
     MatMenuModule,
     MatChipsModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule,
+    FormsModule,
+    MatPaginatorModule
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })
 export class QuestionnaireListComponent implements OnInit {
   questionnaires: Questionnaire[] = [];
+  filteredQuestionnaires: Questionnaire[] = [];
   displayedColumns: string[] = ['index', 'title', 'status', 'responseCount', 'createdAt', 'actions'];
   isLoading = false;
+  showBackToTop = false;
+
+  // 分頁配置
+  pageSize = 10;
+  pageSizeOptions = [5, 10, 25, 50];
+  currentPage = 0;
+  pagedQuestionnaires: Questionnaire[] = [];
+
+  // 篩選條件
+  filterTitle = '';
+  filterStartDate: Date | null = null;
+  filterEndDate: Date | null = null;
+  filterStatus = '';
+
+  // 清空篩選條件
+  clearFilters() {
+    this.filterTitle = '';
+    this.filterStartDate = null;
+    this.filterEndDate = null;
+    this.filterStatus = '';
+    this.applyFilters();
+  }
+
+  statusOptions = [
+    { value: '', label: '全部' },
+    { value: 'DRAFT', label: '草稿' },
+    { value: 'PUBLISHED', label: '已發布' },
+    { value: 'CLOSED', label: '已結束' }
+  ];
 
   constructor(
     private questionnaireService: QuestionnaireService,
@@ -45,6 +89,7 @@ export class QuestionnaireListComponent implements OnInit {
 
   ngOnInit() {
     this.loadQuestionnaires();
+    window.addEventListener('scroll', this.onWindowScroll.bind(this));
   }
 
   loadQuestionnaires() {
@@ -52,6 +97,7 @@ export class QuestionnaireListComponent implements OnInit {
     this.questionnaireService.getQuestionnaires().subscribe({
       next: (data) => {
         this.questionnaires = data;
+        this.applyFilters();
         this.isLoading = false;
       },
       error: (error: Error) => {
@@ -60,6 +106,31 @@ export class QuestionnaireListComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  applyFilters() {
+    this.filteredQuestionnaires = this.questionnaires.filter(questionnaire => {
+      const titleMatch = !this.filterTitle || questionnaire.title.toLowerCase().includes(this.filterTitle.toLowerCase());
+      const statusMatch = !this.filterStatus || questionnaire.status === this.filterStatus;
+      
+      let dateMatch = true;
+      if (this.filterStartDate || this.filterEndDate) {
+        if (questionnaire.createdAt) {
+          const createdDate = new Date(questionnaire.createdAt);
+          if (this.filterStartDate && this.filterStartDate instanceof Date) {
+            dateMatch = dateMatch && createdDate >= this.filterStartDate;
+          }
+          if (this.filterEndDate && this.filterEndDate instanceof Date) {
+            dateMatch = dateMatch && createdDate <= this.filterEndDate;
+          }
+        } else {
+          dateMatch = false;
+        }
+      }
+
+      return titleMatch && statusMatch && dateMatch;
+    });
+    this.updatePagedData();
   }
 
   getStatusColor(status: string): string {
@@ -84,6 +155,19 @@ export class QuestionnaireListComponent implements OnInit {
       default:
         return status;
     }
+  }
+
+  // 分頁事件處理
+  onPageChange(event: PageEvent) {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.updatePagedData();
+  }
+
+  // 更新分頁數據
+  updatePagedData() {
+    const startIndex = this.currentPage * this.pageSize;
+    this.pagedQuestionnaires = this.filteredQuestionnaires.slice(startIndex, startIndex + this.pageSize);
   }
 
   formatDate(date: string): string {
@@ -303,26 +387,36 @@ export class QuestionnaireListComponent implements OnInit {
     return { isValid: true, message: '' };
   }
 
-  onRowClick(questionnaire: Questionnaire, event: Event) {
+  onRowClick(questionnaire: Questionnaire, event: Event): void {
     const target = event?.target as HTMLElement;
-    
-  //   onRowClick(questionnaire: Questionnaire, event: Event) {
-  //     // 如果點擊的是操作按鈕，不進行導航
-  //     if (event?.target instanceof HTMLButtonElement || 
-  //         event?.target instanceof HTMLAnchorElement ||
-  //         (event?.target as HTMLElement)?.closest('button') ||
-  //         (event?.target as HTMLElement)?.closest('a')) {
-  //       return;
-  //     }
-  //     this.router.navigate(['/questionnaires/edit', questionnaire.id]);
-  //   }
-  // }
+
     // 如果點擊的是按鈕、連結，或者其父級元素包含按鈕/連結，則不進行導航
     if (target.closest('button, a')) {
       return;
     }
-    if(questionnaire.status == 'DRAFT'){
-    this.router.navigate(['/questionnaires/edit', questionnaire.id]);
+    
+    if (questionnaire.status === 'DRAFT') {
+      this.router.navigate(['/questionnaires/edit', questionnaire.id]);
+    } else if (questionnaire.status === 'PUBLISHED') {
+      this.snackBar.open('問卷已發布，不可修改', '關閉', { duration: 3000 });
+    }
   }
+
+  onWindowScroll(): void {
+    this.showBackToTop = window.scrollY > 300;
   }
-}  
+
+  scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async share(id: number) {
+    try {
+      const url = `${window.location.origin}/questionnaires/answer/${id}`;
+      await navigator.clipboard.writeText(url);
+      this.snackBar.open('已複製問卷連結！', '關閉', { duration: 2000 });
+    } catch (error) {
+      this.snackBar.open('複製失敗，請重試', '關閉', { duration: 2000 });
+    }
+  }
+}

@@ -23,16 +23,16 @@ export class AuthService {
   private readonly TEST_USERS: { [key: string]: User & { password: string } } = {
     'admin': {
       id: '1',
-      username: 'admin',
-      email: 'andrew901117@gmail.com',
-      password: 'andrew123',
-      displayName: '管理員',
+      username: '超可愛管理者',
+      email: '123',
+      password: '123',
+      displayName: '測試管理員',
       role: 'admin'
     },
     'test': {
       id: '2',
       username: 'test',
-      email: 'test@example.com',
+      email: 'test',
       password: 'test123',
       displayName: '測試用戶',
       role: 'user'
@@ -69,8 +69,19 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
+    // 清除用戶信息
     this.currentUser = null;
+    // 清除本地存儲的令牌和用戶信息
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userRole');
+    // 清除路由歷史
+    window.history.pushState(null, '', '/login');
+window.history.replaceState(null, '', '/login');
+window.history.go(1);
+    // 返回空的 Observable
     return of(void 0);
   }
 
@@ -79,6 +90,24 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return this.currentUser !== null;
+    const savedUser = localStorage.getItem('currentUser');
+    if (!savedUser) {
+      this.currentUser = null;
+      return false;
+    }
+    
+    // 驗證本地存儲的用戶資訊是否與當前用戶一致
+    const localUser = JSON.parse(savedUser);
+    if (!this.currentUser || this.currentUser.id !== localUser.id) {
+      this.currentUser = null;
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      return false;
+    }
+    
+    return true;
   }
 }

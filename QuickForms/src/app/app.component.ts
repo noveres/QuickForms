@@ -25,7 +25,8 @@ export class AppComponent {
     ).subscribe((event) => {
       if (event instanceof NavigationEnd) {
         // 在登入頁面隱藏導航欄
-        this.showNavBar = !event.url.includes('login?returnUrl=%2F');
+        this.showNavBar = !event.url.includes('login') && !event.url.includes('questionnaires/answer');
+    
       }
     });
   }

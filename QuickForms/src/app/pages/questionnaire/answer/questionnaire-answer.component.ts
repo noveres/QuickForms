@@ -238,7 +238,7 @@ export class QuestionnaireAnswerComponent implements OnInit {
     this.responseService.submitResponse(this.questionnaire.id, response).subscribe({
       next: () => {
         this.snackBar.open('問卷提交成功！', '關閉', { duration: 3000 });
-        this.router.navigate(['/questionnaires']);
+        this.router.navigate(['/home']);
       },
       error: (error) => {
         console.error('提交問卷失敗:', error);

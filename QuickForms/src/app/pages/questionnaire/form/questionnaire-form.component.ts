@@ -787,12 +787,33 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const url = `${window.location.origin}/questionnaires/answer/${id}`;
-      await navigator.clipboard.writeText(url);
-      this.snackBar.open('已複製問卷連結！', '關閉', { duration: 2000 });
+      // 獲取問卷信息並檢查狀態
+      this.questionnaireService.getQuestionnaire(parseInt(id, 10)).subscribe({
+        next: (questionnaire) => {
+          if (!questionnaire) {
+            this.snackBar.open('無法獲取問卷信息', '關閉', { duration: 2000 });
+            return;
+          }
 
+          if (questionnaire.status !== 'PUBLISHED') {
+            this.snackBar.open('請先發布問卷後再分享', '關閉', { duration: 2000 });
+            return;
+          }
+
+          const url = `${window.location.origin}/questionnaires/answer/${id}`;
+          navigator.clipboard.writeText(url).then(() => {
+            this.snackBar.open('已複製問卷連結！', '關閉', { duration: 2000 });
+          }).catch(() => {
+            this.snackBar.open('複製失敗，請重試', '關閉', { duration: 2000 });
+          });
+        },
+        error: (error) => {
+          console.error('獲取問卷信息失敗:', error);
+          this.snackBar.open('獲取問卷信息失敗', '關閉', { duration: 2000 });
+        }
+      });
     } catch (error) {
-      this.snackBar.open('複製失敗，請重試', '關閉', { duration: 2000 });
+      this.snackBar.open('分享失敗，請重試', '關閉', { duration: 2000 });
     }
   }
 

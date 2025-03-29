@@ -26,13 +26,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
         <h2>登入</h2>
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="outline">
-            <mat-label>電子郵件</mat-label>
-            <input matInput formControlName="email" type="email" required>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-              請輸入電子郵件
-            </mat-error>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-              請輸入有效的電子郵件地址
+            <mat-label>帳號</mat-label>
+            <input matInput formControlName="username" type="text" required>
+            <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+              請輸入帳號
             </mat-error>
           </mat-form-field>
 
@@ -110,7 +107,7 @@ export class LoginComponent {
     private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
   }
@@ -118,9 +115,9 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.isLoading = true;
-      const { email, password } = this.loginForm.value;
+      const { username, password } = this.loginForm.value;
 
-      this.authService.login(email, password).subscribe({
+      this.authService.login(username, password).subscribe({
         next: () => {
           this.router.navigate(['/home']);
         },
