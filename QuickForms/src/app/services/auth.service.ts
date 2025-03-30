@@ -24,8 +24,8 @@ export class AuthService {
     'admin': {
       id: '1',
       username: '超可愛管理者',
-      email: '123',
-      password: '123',
+      email: 'abc123',
+      password: 'abc123',
       displayName: '測試管理員',
       role: 'admin'
     },
