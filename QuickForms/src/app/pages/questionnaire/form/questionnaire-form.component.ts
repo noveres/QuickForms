@@ -366,8 +366,42 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
   }
 
   removeQuestion(sectionIndex: number, questionIndex: number) {
-    const questionsArray = this.sections.at(sectionIndex).get('questions') as FormArray;
-    questionsArray.removeAt(questionIndex);
+    try {
+      // 獲取並驗證 sections FormArray
+      const sectionsArray = this.questionnaireForm.get('sections') as FormArray;
+      if (!sectionsArray) {
+        throw new Error('無法獲取問卷區塊');
+      }
+
+      // 驗證區塊索引
+      if (sectionIndex < 0 || sectionIndex >= sectionsArray.length) {
+        throw new Error(`無效的區塊索引：${sectionIndex}，區塊總數：${sectionsArray.length}`);
+      }
+
+      // 獲取並驗證 section
+      const section = sectionsArray.at(sectionIndex);
+      if (!section) {
+        throw new Error(`無法獲取區塊：${sectionIndex}`);
+      }
+
+      // 獲取並驗證 questions FormArray
+      const questionsArray = section.get('questions') as FormArray;
+      if (!questionsArray) {
+        throw new Error('無法獲取問題列表');
+      }
+
+      // 驗證問題索引
+      if (questionIndex < 0 || questionIndex >= questionsArray.length) {
+        throw new Error(`無效的問題索引：${questionIndex}，問題總數：${questionsArray.length}`);
+      }
+
+      // 執行刪除操作
+      questionsArray.removeAt(questionIndex);
+      this.snackBar.open('問題已成功刪除', '關閉', { duration: 3000 });
+    } catch (error) {
+      console.error('刪除問題時發生錯誤:', error);
+      this.snackBar.open(error instanceof Error ? error.message : '刪除問題時發生錯誤', '關閉', { duration: 3000 });
+    }
   }
 
   updateQuestionType(sectionIndex: number, questionIndex: number, type: string) {
@@ -598,6 +632,13 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
 
     this.isSaving = true;
     const formValue = this.questionnaireForm.value;
+    
+    // 檢查標題是否為空，如果為空則設置為'未命名問卷'
+    if (!formValue.title || formValue.title.trim() === '') {
+      formValue.title = '未命名問卷';
+      this.questionnaireForm.get('title')?.setValue('未命名問卷');
+    }
+    
     console.log('Form value:', formValue);
 
     // 準備問卷數據，確保每個問題的選項格式正確
@@ -820,8 +861,37 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
   // 發布問卷
   publish() {
     if (!this.questionnaireId) {
+      this.saveDraft();
       this.snackBar.open('請先保存問卷', '關閉', { duration: 3000 });
       return;
+    }
+    
+    // 檢查問卷是否有題目
+    const sectionsArray = this.questionnaireForm.get('sections') as FormArray;
+    if (sectionsArray.length === 0) {
+      this.snackBar.open('問卷必須至少有一個區塊', '關閉', { duration: 3000 });
+      return;
+    }
+    
+    // 檢查是否至少有一個區塊包含問題
+    let hasQuestions = false;
+    for (let i = 0; i < sectionsArray.length; i++) {
+      const questionsArray = sectionsArray.at(i).get('questions') as FormArray;
+      if (questionsArray.length > 0) {
+        hasQuestions = true;
+        break;
+      }
+    }
+    
+    if (!hasQuestions) {
+      this.snackBar.open('問卷必須至少包含一個題目才能發布', '關閉', { duration: 3000 });
+      return;
+    }
+    
+    // 檢查標題是否為空，如果為空則設置為'未命名問卷'
+    const title = this.questionnaireForm.get('title')?.value;
+    if (!title || title.trim() === '') {
+      this.questionnaireForm.get('title')?.setValue('未命名問卷');
     }
 
     this.isPublishing = true;

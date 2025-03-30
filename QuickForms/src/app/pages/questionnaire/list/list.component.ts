@@ -225,6 +225,13 @@ export class QuestionnaireListComponent implements OnInit {
   }
 
   deleteQuestionnaire(id: number): void {
+    // 先查找問卷，檢查狀態是否為已發布
+    const questionnaire = this.filteredQuestionnaires.find(q => q.id === id);
+    if (questionnaire && questionnaire.status === 'PUBLISHED') {
+      this.snackBar.open('禁止刪除已發布的問卷', '關閉', { duration: 3000 });
+      return;
+    }
+    
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: '警告',
@@ -442,21 +449,7 @@ export class QuestionnaireListComponent implements OnInit {
     if (questionnaire.status === 'DRAFT') {
       this.router.navigate(['/questionnaires/edit', questionnaire.id]);
     } else if (questionnaire.status === 'PUBLISHED' || questionnaire.status === 'CLOSED') {
-      // 獲取問卷內容並打開預覽對話框
-      this.questionnaireService.getQuestionnaire(questionnaire.id!).subscribe({
-        next: (fullQuestionnaire) => {
-          this.dialog.open(PreviewDialogComponent, {
-            data: fullQuestionnaire,
-            width: '800px',
-            maxHeight: '90vh'
-          });
-        },
-        error: (error) => {
-          console.error('載入問卷失敗:', error);
-          this.snackBar.open('載入問卷失敗', '關閉', { duration: 3000 });
-        }
-      });
-      
+      // 只顯示提示訊息，不再打開預覽對話框
       if (questionnaire.status === 'PUBLISHED') {
         this.snackBar.open('問卷已發布，不可修改', '關閉', { duration: 3000 });
       } else {

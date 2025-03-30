@@ -16,7 +16,7 @@
           <mat-icon>share</mat-icon>
           分享
         </button> -->
-        <button mat-raised-button type="button" color="primary" (click)="publish()" [disabled]="isPublishing || !questionnaireId">
+        <button mat-raised-button type="button" color="primary" (click)="publish()" >
           <mat-icon>publish</mat-icon>
           發布
         </button>
@@ -44,7 +44,8 @@
             </div>
             
             <div formArrayName="questions" cdkDropList (cdkDropListDropped)="dropQuestion($index, $event)">
-              @for (question of getQuestions($index); track $index; let questionIndex = $index) {
+              @let sectionIndex = $index;
+              @for (question of getQuestions($index); track questionIndex; let questionIndex = $index) {
                 <div [formGroupName]="questionIndex" class="question" cdkDrag>
                   <div class="question-header">
                     <mat-form-field>
@@ -63,7 +64,7 @@
                       </mat-select>
                     </mat-form-field>
                     <mat-checkbox [formControl]="getControl(question, 'required')">必填</mat-checkbox>
-                    <button mat-icon-button color="warn" type="button" (click)="removeQuestion($index, questionIndex)">
+                    <button mat-icon-button color="warn" type="button" (click)="removeQuestion(sectionIndex, questionIndex)">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>

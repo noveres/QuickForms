@@ -161,7 +161,7 @@ export class TemplateService {
           type: 'rating',
           questions: [
             { 
-              label: '工作質量', 
+              label: '工作品質', 
               type: 'rating', 
               required: true,
               options: { max: 5 }
