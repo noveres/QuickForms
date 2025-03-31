@@ -1,0 +1,46 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="card-header">
+      <h2>登入</h2>
+      <p class="subtitle">歡迎回到 QuickForms</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>帳號</mat-label>
+          <!-- <mat-icon>person</mat-icon> -->
+          <input matInput formControlName="username" type="text" required>
+          <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
+            請輸入帳號
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline">
+          <mat-label>密碼</mat-label>
+         
+          <input matInput formControlName="password" type="password" required>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            請輸入密碼
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="test-account">
+        <p>測試帳號: <strong>abc123</strong></p>
+        <p>測試密碼: <strong>abc123</strong></p>
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid || isLoading" class="login-button">
+        @if (isLoading) {
+          <i class="fas fa-spinner fa-spin"></i>
+          登入中...
+        } @else {
+          登入
+        }
+      </button>
+    </form>
+  </div>
+</div>
