@@ -3,13 +3,14 @@
 ## 1. 問卷管理 API
 
 ### 1.1 獲取問卷列表
+
 - **URL**: `/api/questionnaires`
 - **Method**: GET
 - **Query 參數**:
   ```
   page: 頁碼 (從0開始)
   size: 每頁數量
-  status: 狀態篩選 (DRAFT/PUBLISHED)
+  status: 狀態篩選 (DRAFT/PUBLISHED/CLOSED)
   ```
 - **Response**:
   ```json
@@ -29,6 +30,7 @@
   ```
 
 ### 1.2 創建問卷
+
 - **URL**: `/api/questionnaires`
 - **Method**: POST
 - **Request Body**:
@@ -61,6 +63,7 @@
   ```
 
 ### 1.3 獲取問卷詳情
+
 - **URL**: `/api/questionnaires/{id}`
 - **Method**: GET
 - **Response**:
@@ -76,6 +79,7 @@
   ```
 
 ### 1.4 更新問卷
+
 - **URL**: `/api/questionnaires/{id}`
 - **Method**: PUT
 - **Request Body**:
@@ -94,6 +98,7 @@
   ```
 
 ### 1.5 發布問卷
+
 - **URL**: `/api/questionnaires/{id}/publish`
 - **Method**: PATCH
 - **Response**:
@@ -106,6 +111,7 @@
   ```
 
 ### 1.6 刪除問卷
+
 - **URL**: `/api/questionnaires/{id}`
 - **Method**: DELETE
 - **Response**:
@@ -118,6 +124,7 @@
 ## 2. 問卷模板 API
 
 ### 2.1 獲取模板列表
+
 - **URL**: `/api/templates`
 - **Method**: GET
 - **Query 參數**:
@@ -140,6 +147,7 @@
   ```
 
 ### 2.2 獲取模板詳情
+
 - **URL**: `/api/templates/{id}`
 - **Method**: GET
 - **Response**:
@@ -155,6 +163,7 @@
 ## 3. 問卷回答 API
 
 ### 3.1 提交問卷回答
+
 - **URL**: `/api/questionnaires/{id}/responses`
 - **Method**: POST
 - **Request Body**:
@@ -177,6 +186,7 @@
   ```
 
 ### 3.2 獲取回答統計
+
 - **URL**: `/api/questionnaires/{id}/stats`
 - **Method**: GET
 - **Response**:
@@ -203,12 +213,15 @@
 ## 4. 通用信息
 
 ### 4.1 認證
+
 所有請求需要在 Header 中包含 JWT Token：
+
 ```
 Authorization: Bearer <token>
 ```
 
 ### 4.2 錯誤響應格式
+
 ```json
 {
   "errorCode": "ERROR_CODE",
@@ -218,6 +231,7 @@ Authorization: Bearer <token>
 ```
 
 ### 4.3 狀態碼
+
 - 200: 請求成功
 - 201: 創建成功
 - 400: 請求參數錯誤
@@ -229,18 +243,22 @@ Authorization: Bearer <token>
 ## 5. 前端調用位置
 
 ### 5.1 問卷列表頁面 (list.component.ts)
+
 - 獲取問卷列表 API
 - 刪除問卷 API
 
 ### 5.2 問卷編輯頁面 (questionnaire-form.component.ts)
+
 - 創建問卷 API
 - 更新問卷 API
 - 發布問卷 API
 - 獲取問卷詳情 API
 
 ### 5.3 模板選擇頁面 (template-list.component.ts)
+
 - 獲取模板列表 API
 - 獲取模板詳情 API
 
 ### 5.4 問卷統計頁面 (stats.component.ts)
+
 - 獲取回答統計 API

@@ -14,6 +14,10 @@ import java.util.Map;
 // and convert it back to a Map<String, Object> when reading from the database.
 // 此轉換器類別用於將Map<String, Object>轉換為JSON字串以供資料庫存儲
 // 並在從資料庫讀取時轉換回 Map<String, Object>。
+//當用戶提交問卷回答時：
+//1. 前端發送答案數據（Map 格式）
+//2. 轉換器將其轉為 JSON 字符串
+//3. 存入數據庫
 
 @Converter(autoApply = true)
 public class MapToJsonStringConverter implements AttributeConverter<Map<String, Object>, String> {

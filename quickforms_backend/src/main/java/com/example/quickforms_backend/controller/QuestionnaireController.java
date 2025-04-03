@@ -32,11 +32,11 @@ public class QuestionnaireController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getQuestionnaireById(@PathVariable Long id) {
-
+        //使用 Optional 處理空值情況,返回統一的 404 響應格式
         Optional<Questionnaire> questionnaire = Optional.ofNullable(questionnaireService.getQuestionnaireById(id));
         return questionnaire.map(q -> ResponseEntity.ok(new QuestionnaireDTO(q)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
+//  等於下面這段，等於下面這段，代碼更簡潔
 //            try {
 //                Questionnaire questionnaire = questionnaireService.getQuestionnaireById(id);
 //                if (questionnaire == null) {
@@ -80,11 +80,6 @@ public class QuestionnaireController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-//    @PostMapping
-//    public Questionnaire createQuestionnaire(@RequestBody Map<String, Object> data) {
-//        return questionnaireService.createQuestionnaire(data);
-//    }
 
     @PostMapping(value = "/{id}/publish")
     public ResponseEntity<?> publishQuestionnaire(@PathVariable Long id) {

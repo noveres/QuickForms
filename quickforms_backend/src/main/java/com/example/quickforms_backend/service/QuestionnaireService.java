@@ -56,7 +56,7 @@ public class QuestionnaireService {
         }
     }
 
-    //
+    //使用 orElseThrow 直接拋出異常，可能會導致 LazyInitializationException
 //    public Questionnaire getQuestionnaireById(Long id) {
 //        return questionnaireRepository.findById(id)
 //                .orElseThrow(() -> new EntityNotFoundException("問卷不存在"));

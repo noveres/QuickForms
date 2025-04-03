@@ -1,6 +1,18 @@
-# QuickForms
+# QuickForms 前端專案
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.2.
+## 專案介紹
+QuickForms 是一個基於 Angular 框架開發的現代化問卷系統前端應用。本應用提供了直觀的用戶界面，支持問卷的創建、編輯、發布和數據統計等功能。
+
+## 技術架構
+- **框架**: Angular 19.0.2
+- **UI庫**: Angular Material
+- **狀態管理**: RxJS
+- **開發工具**: Angular CLI
+
+## 開發環境需求
+- Node.js 18.x 或以上
+- npm 9.x 或以上
+- Angular CLI 19.0.2
 
 ## Development server
 
