@@ -1,0 +1,67 @@
+<div class="support-container">
+  <mat-card class="support-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>support_agent</mat-icon>
+        客服中心
+      </mat-card-title>
+      <mat-card-subtitle>
+        我們很樂意為您提供協助
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="contact-methods">
+        <div class="contact-item">
+          <mat-icon>phone</mat-icon>
+          <div class="contact-details">
+            <h3>電話支援</h3>
+            <p>週一至週五 9:00-18:00</p>
+            <p class="highlight">0800-123-456</p>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="contact-item">
+          <mat-icon>email</mat-icon>
+          <div class="contact-details">
+            <h3>電子郵件</h3>
+            <p>24小時內回覆</p>
+            <p class="highlight">support&#64;quickforms.com</p>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="contact-item">
+          <mat-icon>chat</mat-icon>
+          <div class="contact-details">
+            <h3>線上客服</h3>
+            <p>即時對話服務</p>
+            <button mat-raised-button color="primary">
+              開始對話
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="faq-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>help</mat-icon>
+        常見問題
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="faq-item" *ngFor="let faq of faqs">
+        <h3>{{ faq.question }}</h3>
+        <p>{{ faq.answer }}</p>
+        <mat-divider></mat-divider>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
