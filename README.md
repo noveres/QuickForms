@@ -45,7 +45,7 @@ cd quickforms_backend
 ./gradlew bootRun
 ```
 
-後端服務將在 http://localhost:8080 啟動
+後端服務將在 http://localhost:8585 啟動
 
 ### 3. 啟動前端應用
 
