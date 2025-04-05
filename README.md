@@ -32,7 +32,7 @@ CREATE DATABASE quickforms;
 2. 執行資料庫初始化腳本
 
 ```bash
-mysql -u your_username -p quickforms < DB/qf_db.sql
+mysql -u your_username -p quickforms < DB/quickforms_db.sql
 ```
 
 ### 2. 啟動後端服務
