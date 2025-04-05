@@ -320,7 +320,7 @@ export class YourNewService {
 
 ### 9.3.3. 在 TypeScript 文件中更新問題類型定義
 
-您還需要在相關的 TypeScript 文件中更新問題類型的定義。通常在 `question.models.ts` 文件中：
+還需要在`question.models.ts` 文件中更新問題類型的定義：
 
 ```typescript:e:\VS_Code\NG_SB_QF\QuickForms\src\app\shared@interface\question.models.ts
 export interface Question {
