@@ -123,6 +123,10 @@
                 <mat-icon>analytics</mat-icon>
                 <span>查看統計</span>
               </button>
+              <button mat-menu-item *ngIf="questionnaire.status === 'DRAFT'" [routerLink]="['/questionnaires/edit', questionnaire.id]">
+                <mat-icon>edit</mat-icon>
+                <span>編輯問卷</span>
+              </button>
               <button mat-menu-item (click)="copyQuestionnaire(questionnaire.id!)">
                 <mat-icon>content_copy</mat-icon>
                 <span>複製問卷</span>
