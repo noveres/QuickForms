@@ -173,22 +173,26 @@ export class QuestionnaireAnswerComponent implements OnInit {
 
   isOptionSelected(question: FormGroup<QuestionForm>, optionKey: string): boolean {
     const answer = question.get('answer')?.value;
-    return Array.isArray(answer) && answer.includes(optionKey);
+    const options = question.get('options')?.value?.choices || {};
+    const optionValue = options[optionKey];
+    return Array.isArray(answer) && answer.includes(optionValue);
   }
 
   toggleOption(question: FormGroup<QuestionForm>, optionKey: string, checked: boolean) {
     const answerControl = question.get('answer');
+    const options = question.get('options')?.value?.choices || {};
     if (!answerControl) return;
 
+    const optionValue = options[optionKey];
     const currentValue = answerControl.value || [];
     const newValue = Array.isArray(currentValue) ? currentValue : [];
     
     if (checked) {
-      if (!newValue.includes(optionKey)) {
-        answerControl.setValue([...newValue, optionKey]);
+      if (!newValue.includes(optionValue)) {
+        answerControl.setValue([...newValue, optionValue]);
       }
     } else {
-      answerControl.setValue(newValue.filter((key: string) => key !== optionKey));
+      answerControl.setValue(newValue.filter((value: string) => value !== optionValue));
     }
 
     answerControl.markAsTouched();

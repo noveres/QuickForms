@@ -49,7 +49,7 @@
           <th mat-header-cell *matHeaderCellDef (click)="sort('index')" style="cursor: pointer">
             編號
             <mat-icon *ngIf="sortColumn === 'index'">
-              {{sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}}
+              {{sortDirection === 'asc' ? '' : 'arrow_downward'}}
             </mat-icon>
           <td mat-cell *matCellDef="let questionnaire"> {{questionnaire.displayIndex}} </td>
         </ng-container>

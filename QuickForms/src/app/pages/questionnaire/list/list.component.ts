@@ -17,7 +17,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { ConfirmDialogComponent } from '../../../shared/@components/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { QuestionnaireService } from '../../../shared/@services/questionnaire.service';
 import { Questionnaire } from '../../../shared/@interface/question.models';
 import { PreviewDialogComponent } from '../form/preview-dialog/preview-dialog.component';
@@ -453,7 +453,7 @@ export class QuestionnaireListComponent implements OnInit {
       if (questionnaire.status === 'PUBLISHED') {
         this.snackBar.open('問卷已發布，不可修改', '關閉', { duration: 3000 });
       } else {
-        this.snackBar.open('問卷已結束，不可修改', '關閉', { duration: 3000 });
+        this.router.navigate(['/questionnaires/statistics', questionnaire.id]);
       }
     }
   }

@@ -1,0 +1,22 @@
+.home-button {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  box-shadow: 0 4px 8px rgba(25, 118, 210, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.home-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(25, 118, 210, 0.3);
+  background: linear-gradient(135deg, #1976d2 30%, #1565c0 100%);
+}
+
+@media (max-width: 600px) {
+  .home-button {
+    bottom: 24px;
+    right: 24px;
+  }
+}

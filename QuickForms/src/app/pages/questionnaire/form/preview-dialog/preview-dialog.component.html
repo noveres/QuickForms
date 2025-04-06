@@ -1,0 +1,90 @@
+<div class="dialog-container">
+  <div mat-dialog-title class="dialog-header">
+    <div class="title-section">
+      <h2>{{ data.title || '預覽問卷' }}</h2>
+      <p class="description" [title]="data.description">{{ (data.description || '').slice(0, 20) }}{{ data.description?.length > 20 ? '...' : '' }}</p>
+    </div>
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-dialog-content class="dialog-content">
+    <div class="preview-container">
+      @for (section of data.sections; track $index) {
+        <div class="question-section">
+          <h3>{{ section.title }}</h3>
+          
+          @for (question of section.questions; track $index) {
+            <div class="question-item">
+              <div class="question-header">
+                <span class="question-label">{{ question.label }}</span>
+                @if (question.required) {
+                  <span class="required-mark">*</span>
+                }
+              </div>
+
+              @switch (question.type) {
+                @case ('short-text') {
+                  <input type="text" class="preview-input" disabled placeholder="短文本回答">
+                }
+                @case ('long-text') {
+                  <textarea class="preview-input" disabled placeholder="長文本回答"></textarea>
+                }
+                @case ('email') {
+                  <input type="email" class="preview-input" disabled placeholder="example@email.com">
+                }
+                @case ('phone') {
+                  <input type="tel" class="preview-input" disabled placeholder="請輸入電話號碼">
+                }
+                @case ('rating') {
+                  <div class="rating-preview">
+                    @for (star of [1,2,3,4,5]; track star) {
+                      <mat-icon class="star-icon">star_border</mat-icon>
+                    }
+                  </div>
+                }
+                @case ('radio') {
+                  <div class="answer-frame" [class.required]="question.required">
+                    <div class="radio-display">
+                      @for (choice of question.options?.choices | keyvalue; track choice.key) {
+                        <div class="option-display">
+                          <div class="radio-circle"></div>
+                          <span>{{ choice.value }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+                @case ('checkbox') {
+                  <div class="answer-frame" [class.required]="question.required">
+                    <div class="checkbox-display">
+                      @for (choice of question.options?.choices | keyvalue; track choice.key) {
+                        <div class="option-display">
+                          <div class="checkbox-square"></div>
+                          <span>{{ choice.value }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+
+        @if (!$last) {
+          <mat-divider class="section-divider"></mat-divider>
+        }
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-divider></mat-divider>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">關閉</button>
+  </mat-dialog-actions>
+</div>

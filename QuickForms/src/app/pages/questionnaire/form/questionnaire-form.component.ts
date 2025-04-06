@@ -99,8 +99,6 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
       }
     });
 
-    // 設置自動保存
-    this.setupAutoSave();
   }
 
   ngOnDestroy() {
@@ -294,8 +292,6 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
 
           console.log('Final form value:', this.questionnaireForm.value);
 
-          // 設置自動保存
-          this.setupAutoSave();
         } catch (error) {
           console.error('Error initializing form:', error);
           this.snackBar.open('初始化問卷時發生錯誤', '關閉', { duration: 3000 });
@@ -564,40 +560,7 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  // 設置自動保存
-  private setupAutoSave() {
-    this.autoSaveInterval = setInterval(() => {
-      this.autoSave();
-    }, this.AUTO_SAVE_INTERVAL);
 
-    // 監聽表單變化
-    this.questionnaireForm.valueChanges.subscribe(() => {
-      if (this.questionnaireForm.dirty) {
-        this.autoSave();
-      }
-    });
-  }
-
-  // 自動保存
-  private autoSave(): void {
-    if (this.questionnaireForm.valid && this.questionnaireForm.dirty) {
-      const formData = this.questionnaireForm.value;
-
-      // 保存到服務器
-      if (this.questionnaireId) {
-        this.questionnaireService.autoSaveDraft(this.questionnaireId, formData)
-          .subscribe({
-            next: () => {
-              console.log('自動保存成功');
-              this.questionnaireForm.markAsPristine();
-            },
-            error: (error: Error) => {
-              console.error('自動保存失敗:', error);
-            }
-          });
-      }
-    }
-  }
 
   // 過濾不需要的字段
   private filterQuestionnaireData(data: any): any {
