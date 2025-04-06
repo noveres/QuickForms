@@ -4,6 +4,32 @@
 
 QuickForms Backend 是一個基於 Spring Boot 框架開發的問卷系統後端服務。本服務提供了完整的問卷管理功能，包括問卷的創建、編輯、發布、回收和統計分析等功能。
 
+### 主要特性
+
+- **靈活的問卷設計**：支持多種題型（單選、多選、填空、評分等）
+- **版本控制**：問卷修改歷史記錄，支持回滾操作
+- **數據分析**：即時統計和數據導出功能
+- **用戶管理**：完整的用戶權限控制系統
+- **API 整合**：RESTful API 設計，易於與其他系統整合
+
+### 功能列表
+
+1. 問卷管理
+   - 問卷模板創建和管理
+   - 問卷發布和截止時間設置
+   - 問卷訪問權限控制
+   - 問卷複製和導入導出
+
+2. 答卷管理
+   - 答卷數據收集
+   - 答卷驗證和過濾
+   - 答卷數據導出
+
+3. 數據分析
+   - 實時統計分析
+   - 自定義報表生成
+   - 數據可視化展示
+
 ## 技術架構
 
 - **框架**: Spring Boot
@@ -16,6 +42,26 @@ QuickForms Backend 是一個基於 Spring Boot 框架開發的問卷系統後端
 - JDK 17 或以上
 - MySQL 8.0 或以上
 - Gradle 8.x
+- IDE 建議：IntelliJ IDEA 或 Eclipse
+- Git 版本控制
+- Postman 或其他 API 測試工具
+
+### 環境配置步驟
+
+1. **JDK 安裝與配置**
+   - 下載並安裝 JDK 17
+   - 設置 JAVA_HOME 環境變數
+   - 將 Java 執行檔路徑添加到 PATH
+
+2. **MySQL 安裝與配置**
+   - 安裝 MySQL 8.0
+   - 創建專用數據庫用戶
+   - 設置適當的訪問權限
+
+3. **IDE 配置**
+   - 安裝 Lombok 插件
+   - 配置 Gradle 整合
+   - 設置項目編碼為 UTF-8
 
 ## 快速開始
 
@@ -72,7 +118,49 @@ spring.datasource.password=your_password
 - `POST /api/responses/questionnaires/${id}`: 提交問卷答案
 - `GET /api/statistics/questionnaire/{id}`: 獲取問卷統計數據
 
-完整 API 文檔可在應用運行後訪問：http://localhost:8080/swagger-ui.html
+完整 API 文檔可在應用運行後訪問：http://localhost:8585/swagger-ui.html
+
+## 錯誤處理和故障排除
+
+### 常見問題解決方案
+
+1. **應用啟動失敗**
+   - 檢查 MySQL 服務是否正常運行
+   - 驗證數據庫連接配置是否正確
+   - 確認端口 8585 未被佔用
+
+2. **API 調用失敗**
+   - 檢查請求格式和參數
+   - 確認 Token 是否有效
+   - 查看服務器日誌獲取詳細錯誤信息
+
+3. **性能問題**
+   - 檢查數據庫索引使用情況
+   - 監控 JVM 內存使用
+   - 優化大量數據查詢
+
+## 測試指南
+
+### 單元測試
+- 使用 JUnit 5 編寫測試用例
+- 運行測試：`./gradlew test`
+- 查看測試報告：`build/reports/tests`
+
+### 整合測試
+- API 測試使用 RestAssured
+- 數據庫測試使用 TestContainers
+
+## 版本更新日誌
+
+### v1.0.0 (2024-01)
+- 初始版本發布
+- 基礎問卷管理功能
+- 用戶認證系統
+
+### v1.1.0 (計劃中)
+- 增加數據導出功能
+- 優化性能
+- 添加更多統計分析工具
 
 ## 專案結構
 
@@ -82,9 +170,10 @@ src/
   │   ├── java/
   │   │   └── com/quickforms/
   │   │       ├── controllers/    # API 控制器
-  │   │       ├── models/         # 資料模型
+  │   │       ├── entity/         # 資料模型
   │   │       ├── repositories/   # 資料庫操作
   │   │       ├── services/       # 業務邏輯
+  │   │       ├── dto/            # 數據傳輸對象
   │   │       └── config/         # 配置類
   │   └── resources/
   │       └── application.properties  # 應用配置
