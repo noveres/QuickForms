@@ -84,10 +84,18 @@ ng serve
 - 實時數據統計
 - 可視化圖表展示
 
-### 後期可拓展
+### 拓展規劃
 - 數據導出功能
 - 自然語言生成問卷
 - 串接Google API更方便結合現有服務
+
+### 貢獻指南
+1. Fork 本專案
+2. 創建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 開啟 Pull Request
+
 
 ## 授權協議
 
