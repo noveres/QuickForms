@@ -120,22 +120,6 @@ spring.datasource.password=your_password
 - 運行測試：`./gradlew test`
 - 查看測試報告：`build/reports/tests`
 
-### 整合測試
-- API 測試使用 RestAssured
-- 數據庫測試使用 TestContainers
-
-## 版本更新日誌
-
-### v1.0.0 (2024-01)
-- 初始版本發布
-- 基礎問卷管理功能
-- 用戶認證系統
-
-### v1.1.0 (計劃中)
-- 增加數據導出功能
-- 優化性能
-- 添加更多統計分析工具
-
 ## 專案結構
 
 ```
