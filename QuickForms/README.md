@@ -299,19 +299,16 @@ export class YourNewService {
 接下來，我們需要在問題內容的 ngSwitch 中添加新的 case 來處理日期類型的渲染：
 
 ```html
-                  <div class="question-content"
-                   [ngSwitch]="getControl(question, 'type').value">
+                  <div class="question-content" [ngSwitch]="getControl(question, 'type').value">
                     <!-- 現有的問題類型... -->
-  
+
                     <!-- 日期類型 -->
-                    <div *ngSwitchCase="'date'" class="date-container">
-                      <div class="answer-frame" [class.required]="getControl(question,'required').value">
+                    <div *ngSwitchCase="'date'">
+                      <div class="answer-frame" [class.required]="getControl(question, 'required').value">
                         <div class="text-input-display date">
                           <mat-icon class="input-icon">calendar_today</mat-icon>
                           <div class="frame-hint">請選擇日期</div>
-                          <div class="required-hint" 
-                          *ngIf="getControl(question,'required').value">必填
-                          </div>
+                          <div class="required-hint" *ngIf="getControl(question, 'required').value">必填</div>
                         </div>
                       </div>
                     </div>
@@ -322,7 +319,7 @@ export class YourNewService {
 
 還需要在`question.models.ts` 文件中更新問題類型的定義：
 
-```typescript:e:\VS_Code\NG_SB_QF\QuickForms\src\app\shared@interface\question.models.ts
+```typescript:e:...QuickForms\src\app\shared@interface\question.models.ts
 export interface Question {
   label: string;
   type: 'short-text' | 'long-text' | 'email' | 'phone' | 'rating' | 'radio' | 'checkbox' | 'select' | 'date';
@@ -377,7 +374,7 @@ private initializeFormWithTemplate(template: Template) {
 
 最後，您可能需要在 `questionnaire-form.component.scss` 中添加新問題類型的樣式：
 
-```scss:e:\VS_Code\NG_SB_QF\QuickForms\src\app\pages\questionnaire\form\questionnaire-form.component.scss
+```scss:QuickForms\src\app\pages\questionnaire\form\questionnaire-form.component.scss
 .date-container {
   margin-top: 10px;
   
