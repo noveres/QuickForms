@@ -6,10 +6,11 @@ QuickForms 是一個基於 Angular 框架開發的現代化問卷系統前端應
 
 ## 2. 技術架構
 
-- **前端框架**: Angular 19.0.2
-- **UI庫**: Angular Material
-- **狀態管理**: RxJS
-- **開發工具**: Angular CLI
+- **前端框架**: Angular 19.0.0
+- **UI庫**: Angular Material 19.1.2
+- **狀態管理**: RxJS 7.8.0
+- **圖表庫**: Chart.js 4.4.7 與 ng2-charts 8.0.0
+- **開發工具**: Angular CLI 19.0.2
 - **版本控制**: Git
 - **構建工具**: Webpack (通過 Angular CLI)
 
@@ -37,7 +38,7 @@ QuickForms 是一個基於 Angular 框架開發的現代化問卷系統前端應
 3. 啟動開發服務器
 
    ```bash
-   ng serve --open
+   npm start
    ```
 4. 打開瀏覽器訪問 `http://localhost:4200/`
 
@@ -46,7 +47,7 @@ QuickForms 是一個基於 Angular 框架開發的現代化問卷系統前端應
 ### 4.1 構建專案
 
 ```bash
-ng build --prod
+ng build
 ```
 
 構建產物將存放在 `dist/` 目錄中。
@@ -65,7 +66,7 @@ ng build --prod
 ### 5.1 前後端架構
 
 ```
-前端 (Angular) <-->  Request API <--> 後端 (Spring Boot) <--> 資料庫 (MySQL)
+前端 (Angular) <-->  API (http://localhost:8585/api) <--> 後端 (Spring Boot) <--> 資料庫 (MySQL)
 ```
 
 ### 5.2 前端架構
@@ -83,20 +84,21 @@ src/
     components/       # 共用組件
     guards/           # 路由守衛
     pages/            # 頁面組件
-      auth/           # 登入認證相關頁面(僅前端)
+      auth/           # 登入認證相關頁面
         login/        # 登入頁面組件
-      profile/        # 用戶資料頁面(僅前端)
+      profile/        # 用戶資料頁面
       questionnaire/  # 問卷相關頁面
         answer/       # 問卷填寫頁面
         form/         # 問卷編輯頁面
         home/         # 問卷首頁
         list/         # 問卷列表頁
+        services/     # 問卷相關服務
         statistics/   # 統計分析頁面
       support/        # 支援頁面
     shared/           # 共享資源
-      @components/    # 共享組件
       @interface/     # 介面定義
       @services/      # 共享服務
+      components/     # 共享組件
   environments/       # 環境配置
 ```
 
@@ -108,6 +110,8 @@ src/
 - **編輯問卷**: 添加、修改、刪除問題和選項
 - **預覽問卷**: 實時預覽問卷效果
 - **發布問卷**: 將問卷狀態從草稿變更為已發布
+- **複製問卷**: 複製現有問卷作為新問卷
+- **自動保存**: 自動保存問卷編輯進度
 
 ### 6.2 問卷填寫
 
@@ -126,14 +130,19 @@ src/
 
 ```typescript
 interface Questionnaire {
-  id: string;
+  id: number;
   title: string;
   description?: string;
-  status: 'DRAFT' | 'PUBLISHED' | 'CLOSED';
+  status?: 'DRAFT' | 'PUBLISHED'| 'CLOSED';
   sections: Section[];
-  createdAt: Date;
-  updatedAt: Date;
-  publishedAt?: Date;
+  settings?: QuestionnaireSettings;
+  content?: string | QuestionnaireContent; // 可以是 JSON 字符串或解析後的對象
+  responseCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  displayIndex?: number;
 }
 ```
 
@@ -141,12 +150,37 @@ interface Questionnaire {
 
 ```typescript
 interface Question {
-  id: string;
-  type: 'TEXT' | 'TEXTAREA' | 'RADIO' | 'CHECKBOX' | 'SELECT' | 'DATE' | 'TIME' | 'RATING';
+  id: number;
   label: string;
+  type: string; // 'short-text', 'long-text', 'email', 'phone', 'rating', 'radio', 'checkbox', 'select', 'date' 等
   required: boolean;
-  options?: Option[];
-  validationRules?: any;
+  options?: QuestionOption;
+  value?: any;
+}
+
+interface QuestionOption {
+  min?: number;
+  max?: number;
+  choices?: Record<string, string>;
+  placeholder?: string;
+  allowOther?: boolean;
+  multiple?: boolean;
+}
+```
+
+### 7.3 回答模型
+
+```typescript
+interface QuestionAnswerDTO {
+  questionId: number;
+  answerValue: string;
+}
+
+interface QuestionnaireResponseDTO {
+  answers: QuestionAnswerDTO[];
+  respondentId?: string;
+  ipAddress?: string;
+  userAgent?: string;
 }
 ```
 
@@ -154,22 +188,33 @@ interface Question {
 
 ### 8.1 問卷管理 API
 
-- **獲取問卷列表**: GET `/api/questionnaires`
-- **創建問卷**: POST `/api/questionnaires`
-  **測試格式**
+- **獲取問卷列表**: GET `http://localhost:8585/api/questionnaires`
+- **獲取問卷詳情**: GET `http://localhost:8585/api/questionnaires/{id}`
+- **創建問卷**: POST `http://localhost:8585/api/questionnaires`
+- **更新問卷**: PUT `http://localhost:8585/api/questionnaires/{id}`
+- **刪除問卷**: DELETE `http://localhost:8585/api/questionnaires/{id}`
+- **發布問卷**: POST `http://localhost:8585/api/questionnaires/{id}/publish`
+- **取消發布**: POST `http://localhost:8585/api/questionnaires/{id}/unpublish`
+- **下架問卷**: POST `http://localhost:8585/api/questionnaires/{id}/out`
+- **複製問卷**: POST `http://localhost:8585/api/questionnaires/{id}/copy`
+- **自動保存**: POST `http://localhost:8585/api/questionnaires/{id}/auto-save`
+- **獲取統計數據**: GET `http://localhost:8585/api/questionnaires/{id}/stats`
+
+**問卷創建/更新格式示例**
 
 ```json
 {
   "title": "訂單管理",
   "description": "管理客戶的訂單資訊",
+  "status": "DRAFT",
   "sections": [
     {
       "title": "客戶資訊",
       "type": "text",
       "questions": [
-        { "label": "客戶姓名", "type": "short-text", "required": true },
-        { "label": "聯繫電話", "type": "phone", "required": true },
-        { "label": "送貨地址", "type": "short-text", "required": true }
+        { "id": 1, "label": "客戶姓名", "type": "short-text", "required": true },
+        { "id": 2, "label": "聯繫電話", "type": "phone", "required": true },
+        { "id": 3, "label": "送貨地址", "type": "short-text", "required": true }
       ]
     },
     {
@@ -177,6 +222,7 @@ interface Question {
       "type": "checkbox",
       "questions": [
         {
+          "id": 4,
           "label": "選擇商品",
           "type": "checkbox",
           "required": true,
@@ -189,65 +235,123 @@ interface Question {
           }
         }
       ]
-    },
-    {
-      "title": "支付方式",
-      "type": "radio",
-      "questions": [
-        {
-          "label": "請選擇支付方式",
-          "type": "radio",
-          "required": true,
-          "options": {
-            "choices": {
-              "credit_card": "信用卡",
-              "paypal": "PayPal",
-              "bank_transfer": "銀行轉帳"
-            }
-          }
-        }
-      ]
     }
-  ]
+  ],
+  "settings": {
+    "allowAnonymous": true,
+    "requireLogin": false
+  }
 }
-
 ```
-
-- **獲取問卷詳情**: GET `/api/questionnaires/{id}`
-- **更新問卷**: PUT `/api/questionnaires/{id}`
-- **發布問卷**: PATCH `/api/questionnaires/{id}/publish`
-- **刪除問卷**: DELETE `/api/questionnaires/{id}`
 
 ### 8.2 問卷回答 API
 
-- **提交問卷回答**: POST `api/responses/questionnaires/{id}`
-  **測試格式**
+- **提交問卷回答**: POST `http://localhost:8585/api/responses/questionnaires/{id}`
+
+**回答提交格式示例**
 
 ```json
 {
   "answers": [
     {
       "questionId": 1,
-      "answerValue": "回答內容1"
+      "answerValue": "張三"
     },
     {
       "questionId": 2,
-      "answerValue": "回答內容2"
+      "answerValue": "0912345678"
     },
     {
       "questionId": 3,
-      "answerValue": "回答內容3"
+      "answerValue": "台北市信義區信義路五段7號"
+    },
+    {
+      "questionId": 4,
+      "answerValue": "1,3"
     }
   ],
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 }
 ```
 
-- **獲取回答統計**: GET `/api/statistics/questionnaires/{id}`
+## 9. 路由配置
 
-## 9. 擴展系統
+系統使用 Angular 的懶加載路由機制，主要路由如下：
 
-### 9.1 添加新的路由
+```typescript
+// 公開路由
+{
+  path: 'login',
+  component: LoginComponent
+},
+{
+  path: 'questionnaires/answer/:id',
+  loadComponent: () => import('./pages/questionnaire/answer/questionnaire-answer.component')
+    .then(m => m.QuestionnaireAnswerComponent)
+},
+
+// 需要驗證的路由
+{
+  path: '',
+  canActivate: [AuthGuard],
+  children: [
+    {
+      path: 'home',
+      loadComponent: () => import('./pages/questionnaire/home/home.component')
+        .then(m => m.HomeComponent)
+    },
+    {
+      path: 'questionnaires',
+      loadChildren: () => [
+        {
+          path: 'list',
+          loadComponent: () => import('./pages/questionnaire/list/list.component')
+            .then(m => m.QuestionnaireListComponent)
+        },
+        {
+          path: 'new',
+          loadComponent: () => import('./pages/questionnaire/form/questionnaire-form.component')
+            .then(m => m.QuestionnaireFormComponent)
+        },
+        {
+          path: 'edit/:id',
+          loadComponent: () => import('./pages/questionnaire/form/questionnaire-form.component')
+            .then(m => m.QuestionnaireFormComponent)
+        },
+        {
+          path: 'statistics/:id',
+          loadComponent: () => import('./pages/questionnaire/statistics/statistics.component')
+            .then(m => m.StatisticsComponent)
+        }
+      ]
+    },
+    {
+      path: 'profile',
+      loadComponent: () => import('./pages/profile/profile.component')
+        .then(m => m.ProfileComponent)
+    },
+    {
+      path: 'support',
+      loadComponent: () => import('./pages/support/support.component')
+        .then(m => m.SupportComponent)
+    }
+  ]
+}
+```
+
+## 10. 擴展系統
+
+### 10.1 添加新的問題類型
+
+要添加新的問題類型，需要進行以下步驟：
+
+1. 在 `question.models.ts` 中更新問題類型定義
+2. 在問卷編輯頁面的問題類型選擇下拉選單中添加新選項
+3. 在問卷編輯頁面的 ngSwitch 中添加新的 case 來處理新類型的渲染
+4. 在問卷填寫頁面添加對應的輸入控件和數據處理邏輯
+5. 更新相關的表單處理和數據轉換邏輯
+
+### 10.2 添加新的路由
 
 在 `app.routes.ts` 中添加新路由：
 
@@ -260,323 +364,20 @@ interface Question {
 }
 ```
 
-### 9.2 創建新的服務
+### 10.3 創建新的服務
 
 ```typescript
 @Injectable({
   providedIn: 'root'
 })
 export class YourNewService {
+  private readonly API_URL = 'http://localhost:8585/api';
+  
+  constructor(private http: HttpClient) {}
+  
   // 實現您的服務邏輯
 }
 ```
-
-### 9.3 添加新的問卷類型
-
-### 9.3.1 添加新的問題類型
-
-首先，我們需要在 `\src\app\pages\questionnaire`的問題類型選擇下拉選單中添加新的選項。
-假設我們要添加一個「日期」問題類型：
-
-```html
-    <mat-form-field>
-      <mat-select [formControl]="getControl(question, 'type')">
-        <mat-option value="short-text">短文本</mat-option>
-        <mat-option value="long-text">長文本</mat-option>
-        <mat-option value="email">電子郵件</mat-option>
-        <mat-option value="phone">電話</mat-option>
-        <mat-option value="rating">評分</mat-option>
-        <mat-option value="radio">單選</mat-option>
-        <mat-option value="checkbox">多選</mat-option>
-         <mat-option value="select">下拉選擇</mat-option>
-         <mat-option value="date">日期</mat-option> //新增的類型
-	   </mat-select>
-     </mat-form-field>
-```
-
-### 9.3.2. 實現對應的渲染邏輯
-
-接下來，我們需要在問題內容的 ngSwitch 中添加新的 case 來處理日期類型的渲染：
-
-```html
-                  <div class="question-content" [ngSwitch]="getControl(question, 'type').value">
-                    <!-- 現有的問題類型... -->
-
-                    <!-- 日期類型 -->
-                    <div *ngSwitchCase="'date'">
-                      <div class="answer-frame" [class.required]="getControl(question, 'required').value">
-                        <div class="text-input-display date">
-                          <mat-icon class="input-icon">calendar_today</mat-icon>
-                          <div class="frame-hint">請選擇日期</div>
-                          <div class="required-hint" *ngIf="getControl(question, 'required').value">必填</div>
-                        </div>
-                      </div>
-                    </div>
-  
-```
-
-### 9.3.3. 在 TypeScript 文件中更新問題類型定義
-
-還需要在`question.models.ts` 文件中更新問題類型的定義：
-
-```typescript:e:...QuickForms\src\app\shared@interface\question.models.ts
-export interface Question {
-  label: string;
-  type: 'short-text' | 'long-text' | 'email' | 'phone' | 'rating' | 'radio' | 'checkbox' | 'select' | 'date';
-  required: boolean;
-  options?: {
-    max?: number;
-    choices?: Record<string, string>;
-    placeholder?: string;
-    allowOther?: boolean;
-    multiple?: boolean;
-    dateFormat?: string; // 新增日期格式選項
-  };
-  value?: any;
-}
-```
-
-### 9.3.4. 在組件 TypeScript 文件中處理新問題類型的邏輯
-
-在 `questionnaire-form.component.ts` 中，您需要更新 `initializeFormWithTemplate` 和其他相關方法來處理新的問題類型：
-
-```typescript:e:\VS_Code\NG_SB_QF\QuickForms\src\app\pages\questionnaire\form\questionnaire-form.component.ts
-private initializeFormWithTemplate(template: Template) {
-  // 現有代碼...
-  
-  section.questions.forEach(question => {
-    // 根據問題類型設置默認值
-    let defaultValue: any = '';
-    switch (question.type) {
-      case 'rating':
-        defaultValue = 0;
-        break;
-      case 'checkbox':
-        defaultValue = [];
-        break;
-      case 'radio':
-      case 'select':
-        defaultValue = null;
-        break;
-      case 'date':
-        defaultValue = null; // 日期類型的默認值
-        break;
-      default:
-        defaultValue = '';
-    }
-  
-    // 現有代碼...
-  });
-}
-```
-
-### 9.3.5. 添加相應的 CSS 樣式
-
-最後，您可能需要在 `questionnaire-form.component.scss` 中添加新問題類型的樣式：
-
-```scss:QuickForms\src\app\pages\questionnaire\form\questionnaire-form.component.scss
-.date-container {
-  margin-top: 10px;
-  
-  .text-input-display.date {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 4px;
-  
-    .input-icon {
-      margin-right: 10px;
-      color: #666;
-    }
-  }
-}
-```
-
-以上步驟完成後，您就成功地在問卷模型中添加了新的問題類型（日期）並實現了對應的渲染邏輯。您可以按照類似的方式添加其他問題類型，如數字、時間、文件上傳等。
-
-需要注意的是，如果新問題類型需要特殊的交互邏輯（如日期選擇器），還需要引入相應的 Angular Material 組件並實現相關的處理函數。
-
-## 9.4. 在問卷組件中實現對應的渲染邏輯
-
-### 9.4.1. 獲取問卷數據
-
-首先，系統需要從後端獲取問卷數據：
-
-```typescript
-loadQuestionnaire(id: number): void {
-  this.questionnaireService.getQuestionnaire(id).subscribe({
-    next: (questionnaire) => {
-      if (questionnaire) {
-        this.questionnaire = questionnaire;
-        this.initializeForm();
-      }
-    },
-    error: (error) => {
-      console.error('載入問卷失敗:', error);
-    }
-  });
-}
-```
-
-### 9.4.2. 初始化回答表單
-
-`src\app\pages\questionnaire\answer`
-根據問卷結構動態創建表單：
-
-```typescript
-initializeForm(): void {
-  // 創建主表單
-  this.answerForm = this.fb.group({});
-  
-  // 為每個問題創建表單控件
-  this.questionnaire.sections.forEach(section => {
-    section.questions.forEach(question => {
-      // 根據問題類型設置默認值
-      let defaultValue: any = '';
-      switch (question.type) {
-        case 'rating':
-          defaultValue = 0;
-          break;
-        case 'checkbox':
-          defaultValue = [];
-          break;
-        case 'radio':
-        case 'select':
-          defaultValue = null;
-          break;
-        default:
-          defaultValue = '';
-      }
-  
-      // 添加表單控件
-      this.answerForm.addControl(
-        `question_${question.id}`,
-        this.fb.control(defaultValue, question.required ? Validators.required : null)
-      );
-    });
-  });
-}
-```
-
-### 9.4.3. 渲染問卷界面
-
-在模板中根據問題類型渲染不同的輸入控件：
-
-```html
-<div *ngFor="let section of questionnaire.sections">
-  <h2>{{ section.title }}</h2>
-  
-  <div *ngFor="let question of section.questions">
-    <div class="question-container" [ngSwitch]="question.type">
-      <!-- 短文本 -->
-      <mat-form-field *ngSwitchCase="'short-text'" class="full-width">
-        <mat-label>{{ question.label }}</mat-label>
-        <input matInput [formControlName]="'question_' + question.id">
-        <mat-error *ngIf="isRequired(question.id)">此欄位為必填</mat-error>
-      </mat-form-field>
-  
-      <!-- 長文本 -->
-      <mat-form-field *ngSwitchCase="'long-text'" class="full-width">
-        <mat-label>{{ question.label }}</mat-label>
-        <textarea matInput [formControlName]="'question_' + question.id" rows="4"></textarea>
-        <mat-error *ngIf="isRequired(question.id)">此欄位為必填</mat-error>
-      </mat-form-field>
-  
-      <!-- 評分 -->
-      <div *ngSwitchCase="'rating'" class="rating-container">
-        <div class="question-label">{{ question.label }}</div>
-        <mat-slider [max]="question.options?.max || 5" [step]="1" [thumbLabel]="true"
-                   [formControlName]="'question_' + question.id"></mat-slider>
-      </div>
-  
-      <!-- 單選 -->
-      <div *ngSwitchCase="'radio'" class="radio-container">
-        <div class="question-label">{{ question.label }}</div>
-        <mat-radio-group [formControlName]="'question_' + question.id">
-          <mat-radio-button *ngFor="let choice of question.options?.choices | keyvalue" 
-                           [value]="choice.key">
-            {{ choice.value }}
-          </mat-radio-button>
-        </mat-radio-group>
-      </div>
-  
-      <!-- 其他問題類型... -->
-    </div>
-  </div>
-</div>
-```
-
-### 9.4.4. 提交回答
-
-當用戶完成問卷後，將回答數據提交到後端：
-
-```typescript
-
-   // 提交回答
-      this.responseService.submitResponse(this.questionnaire.id, response).subscribe({
-      next: () => {
-        this.snackBar.open('問卷提交成功！', '關閉', { duration: 3000 });
-        this.router.navigate(['/home']);
-      },
-      error: (error) => {
-        console.error('提交問卷失敗:', error);
-        this.snackBar.open('提交問卷失敗', '關閉', { duration: 3000 });
-        this.isSubmitting = false;
-      }
-    });
-  }
-```
-
-### 9.4.5. 表單驗證
-
-實現表單驗證以確保必填欄位已填寫：
-
-```typescript
- onSubmit() {
-    if (this.isSubmitting || !this.questionnaire) return;
-
-    this.markFormGroupTouched(this.answerForm);
-  
-    if (this.answerForm.invalid) {
-      this.snackBar.open('請填寫所有必填項目', '關閉', { duration: 3000 });
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    // 收集所有答案
-    const answers: QuestionAnswerDTO[] = [];
-    this.questionnaire.sections.forEach((section, sectionIndex) => {
-      section.questions.forEach((question, questionIndex) => {
-        const questionControl = this.getQuestionControls(sectionIndex)[questionIndex];
-        const answer = questionControl.get('answer')?.value;
-      
-        // 如果是複選框，需要將選中的選項組合成字符串
-        if (question.type === 'checkbox' && Array.isArray(answer)) {
-          answers.push({
-            questionId: question.id,
-            answerValue: answer.join(',')
-          });
-        } else {
-          answers.push({
-            questionId: question.id,
-            answerValue: answer?.toString() || ''
-          });
-        }
-      });
-    });
-```
-
-## 技術亮點
-
-1. **動態表單生成**：根據問卷結構動態創建表單控件
-2. **類型適配**：為不同問題類型提供適合的輸入控件
-3. **響應式設計**：使用 Angular 的響應式表單進行狀態管理
-4. **數據轉換**：將表單數據轉換為後端需要的格式
-5. **用戶體驗優化**：提供表單驗證和錯誤提示
-
-這種實現方式使得問卷回答功能既靈活又易於維護，能夠適應各種類型的問卷需求。
 
 ## 11. 最佳實踐
 
@@ -585,15 +386,17 @@ initializeForm(): void {
 - 相關功能放在同一目錄下
 - 使用適當的命名約定
 - 保持組件的單一職責
+- 使用懶加載提高性能
 
 ### 11.2 安全性考慮
 
+- 使用 AuthGuard 保護需要驗證的路由
 - 驗證所有用戶輸入
-- 透過**User-Agent** 字串分析使用者設備驗證用戶端來源
+- 透過 User-Agent 字串分析使用者設備驗證用戶端來源
 
 ### 11.3 性能優化
 
-- 使用懶加載
+- 使用懶加載減少初始加載時間
 - 實現適當的緩存策略
-- 優化數據結構
-  
+- 優化數據結構和渲染邏輯
+- 使用 OnPush 變更檢測策略減少不必要的渲染
