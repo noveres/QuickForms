@@ -187,7 +187,7 @@ interface QuestionnaireResponseDTO {
 
 ## 8. API 接口
 
--[API文檔]()
+請參閱：[API文檔](https://github.com/noveres/QuickForms/blob/main/docs/api/API%E6%96%87%E6%AA%94.md)
 
 ## 9. 路由配置
 
