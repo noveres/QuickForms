@@ -20,7 +20,7 @@ QuickForms 是一個類似Google表單的現代化問卷調查系統，採用前
 
 ### API文檔 (api_documentation)
 - **API文件**：[API文檔](docs/api/API%E6%96%87%E6%AA%94.md)
-- **Swagger**：[http://localhost:8585/swagger-ui.html](http://localhost:8585/swagger-ui.html)(請啟動後端)
+- **Swagger**：[http://localhost:8585/swagger-ui.html](http://localhost:8585/swagger-ui.html)
 
 ## 快速開始
 
