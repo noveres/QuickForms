@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#f8f9fa" />
+  
+  <!-- 標題 -->
+  <text x="400" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#333333" font-weight="bold">QuickForms 系統架構圖</text>
+  
+  <!-- 客戶端層 -->
+  <rect x="50" y="80" width="700" height="80" rx="5" ry="5" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" />
+  <text x="400" y="110" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#0d47a1" font-weight="bold">前端應用層</text>
+  <text x="400" y="140" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333">Angular 前端應用 (問卷創建、填寫、統計分析界面)</text>
+  
+  <!-- API層 -->
+  <rect x="50" y="190" width="700" height="80" rx="5" ry="5" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" />
+  <text x="400" y="220" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#1b5e20" font-weight="bold">API層</text>
+  <text x="400" y="250" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333">RESTful API (SpringDoc OpenAPI/Swagger) - 問卷管理、答卷提交、數據分析</text>
+  
+  <!-- 服務層 -->
+  <rect x="50" y="300" width="700" height="100" rx="5" ry="5" fill="#fff3e0" stroke="#ff9800" stroke-width="2" />
+  <text x="400" y="330" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#e65100" font-weight="bold">服務層</text>
+  <text x="200" y="360" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333">問卷服務</text>
+  <text x="400" y="360" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333">答卷服務</text>
+  <text x="600" y="360" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333">統計分析服務</text>
+  <text x="400" y="385" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333">業務邏輯處理、數據驗證、轉換器</text>
+  
+  <!-- 數據訪問層 -->
+  <rect x="50" y="430" width="700" height="80" rx="5" ry="5" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2" />
+  <text x="400" y="460" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#4a148c" font-weight="bold">數據訪問層</text>
+  <text x="400" y="490" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#333333">Spring Data JPA / Hibernate ORM - 實體模型、資料庫操作</text>
+  
+  <!-- 數據庫層 -->
+  <rect x="50" y="540" width="700" height="40" rx="5" ry="5" fill="#ffebee" stroke="#f44336" stroke-width="2" />
+  <text x="400" y="565" font-family="Arial, sans-serif" font-size="18" text-anchor="middle" fill="#b71c1c" font-weight="bold">MySQL 8.0 數據庫 (HikariCP連接池)</text>
+  
+  <!-- 連接線 -->
+  <!-- 前端到API -->
+  <line x1="400" y1="160" x2="400" y2="190" stroke="#757575" stroke-width="2" stroke-dasharray="5,5" />
+  <!-- API到服務層 -->
+  <line x1="400" y1="270" x2="400" y2="300" stroke="#757575" stroke-width="2" stroke-dasharray="5,5" />
+  <!-- 服務層到數據訪問層 -->
+  <line x1="400" y1="400" x2="400" y2="430" stroke="#757575" stroke-width="2" stroke-dasharray="5,5" />
+  <!-- 數據訪問層到數據庫 -->
+  <line x1="400" y1="510" x2="400" y2="540" stroke="#757575" stroke-width="2" stroke-dasharray="5,5" />
+  
+  <!-- 箭頭 -->
+  <polygon points="395,185 405,185 400,190" fill="#757575" />
+  <polygon points="395,295 405,295 400,300" fill="#757575" />
+  <polygon points="395,425 405,425 400,430" fill="#757575" />
+  <polygon points="395,535 405,535 400,540" fill="#757575" />
+</svg>
