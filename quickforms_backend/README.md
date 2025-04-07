@@ -112,11 +112,9 @@ gradlew.bat bootRun  # Windows環境使用
 
 ## API 文檔
 
-1.[GIT倉庫的README有完整的API](https://github.com/noveres/QuickForms)
+1.請參閱：[API文檔](https://github.com/noveres/QuickForms/blob/main/docs/api/API%E6%96%87%E6%AA%94.md)
 
-2.應用將在 http://localhost:8585 啟動
-
-- Swagger API文檔：http://localhost:8585/swagger-ui.html
+2.Swagger API文檔： 啟動後端開啟瀏覽器後進入[http://localhost:8585/swagger-ui.html](http://localhost:8585/swagger-ui.html)
 
 ## 錯誤處理和故障排除
 
