@@ -18,7 +18,7 @@ QuickForms 是一個類似Google表單的現代化問卷調查系統，採用前
 - **資料庫**: MySQL 8.0
 - **專案管理**: Gradle
 
-[**API文檔**](QuickForms/blob/main/docs/api/API%E6%96%87%E6%AA%94.md)
+[**API文檔**](docs/api/API%E6%96%87%E6%AA%94.md)
 ## 快速開始
 
 ### 1. 資料庫設置
