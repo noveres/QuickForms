@@ -119,9 +119,11 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
   }
 
   private initializeFormWithTemplate(template: Template) {
-    // 設置問卷標題
+    // 設置問卷標題與描述
     this.questionnaireForm.patchValue({
-      title: template.title
+      title: template.title,
+      description: template.description || ''
+
     });
 
     // 獲取 sections FormArray
@@ -474,11 +476,15 @@ export class QuestionnaireFormComponent implements OnInit, OnDestroy {
 
   addOption(question: AbstractControl): void {
     const choices: Record<string, string> = this.getNestedControl(question, 'options.choices').value || {};
-    const newKey = Object.keys(choices).length.toString();
-    const newChoices = {
-      ...choices,
-      [newKey]: `選項${Object.keys(choices).length + 1}`
-    };
+    // 使用 Object.values 獲取實際的選項數組
+    const existingOptions = Object.values(choices);
+    // 重新生成選項對象，確保索引連續
+    const newChoices: Record<string, string> = {};
+    existingOptions.forEach((value, index) => {
+      newChoices[index.toString()] = value;
+    });
+    // 添加新選項
+    newChoices[existingOptions.length.toString()] = `選項${existingOptions.length + 1}`;
     this.getNestedControl(question, 'options.choices').setValue(newChoices);
   }
 
