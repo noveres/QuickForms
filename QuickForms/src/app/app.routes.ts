@@ -12,7 +12,8 @@ export const routes: Routes = [
   {
     path: 'questionnaires/answer/:id',
     loadComponent: () => import('./pages/questionnaire/answer/questionnaire-answer.component')
-      .then(m => m.QuestionnaireAnswerComponent)
+      .then(m => m.QuestionnaireAnswerComponent),
+    data: { public: true }
   },
   
   // 需要驗證的路由

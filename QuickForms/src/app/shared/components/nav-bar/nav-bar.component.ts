@@ -75,17 +75,17 @@ import { Router, UrlTree } from '@angular/router';
             <span class="role">{{ currentUser?.isAdmin ? '管理者' : '一般用戶' }}</span>
           </div>
         </div>
-        
-        <mat-divider></mat-divider>
-        <button  mat-menu-item> <!-- routerLink="/profile"> -->         
+        <!-- routerLink="/profile"> -->   
+        <!-- <mat-divider></mat-divider>
+        <button  mat-menu-item>       
           <mat-icon>person</mat-icon>
           <span>個人資料</span>
-        </button>
-
+        </button> -->
+<!-- 
         <button mat-menu-item (click)="toggleRole()">
           <mat-icon>swap_horiz</mat-icon>
           <span>切換身份</span>
-        </button>
+        </button> -->
 
         <mat-divider></mat-divider>
 

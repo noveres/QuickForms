@@ -41,6 +41,7 @@
         @for (section of sections.controls; track $index) {
           <div [formGroupName]="$index" class="section">
             <div class="section-header">
+              <div class="question-actions-row">
               <mat-form-field>
                 <mat-label>區塊標題</mat-label>
                 <input matInput formControlName="title" placeholder="請輸入區塊標題">
@@ -49,6 +50,7 @@
                       [attr.aria-label]="'刪除區塊 ' + section.get('title')?.value">
                 <mat-icon>delete</mat-icon>
               </button>
+            </div>
             </div>
             
             <div formArrayName="questions" cdkDropList (cdkDropListDropped)="dropQuestion($index, $event)">
@@ -71,11 +73,13 @@
                         <mat-option value="select">下拉選擇</mat-option>
                       </mat-select>
                     </mat-form-field>
+                    <div class="question-actions-row">
                     <mat-checkbox [formControl]="getControl(question, 'required')">必填</mat-checkbox>
                     <button mat-icon-button color="warn" type="button" (click)="removeQuestion(sectionIndex, questionIndex)">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </div>
+                </div> 
 
                   <div class="question-content" [ngSwitch]="getControl(question, 'type').value">
                     <!-- 評分 -->
