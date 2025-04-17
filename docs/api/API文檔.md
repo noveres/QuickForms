@@ -11,6 +11,7 @@
 - **下架問卷**: POST `http://localhost:8585/api/questionnaires/{id}/out`
 - **複製問卷**: POST `http://localhost:8585/api/questionnaires/{id}/copy`
 - **獲取統計數據**: GET `http://localhost:8585/api/questionnaires/{id}/stats`
+- **提交問卷回答**: POST `http://localhost:8585/api/responses/questionnaires/{id}`
 
 **問卷創建/更新格式示例**
 
