@@ -4,6 +4,8 @@
 
 QuickForms 是一個類似Google表單的現代化問卷調查系統，採用前後端分離架構設計。系統提供直觀的用戶界面，支持問卷的創建、編輯、發布、回收和統計分析等完整功能。
 
+［點我前往體驗］（https://d1ieh0ztqt28xg.cloudfront.net/home）
+
 ## 系統架構
 
 ### 前端 (QuickForms)
